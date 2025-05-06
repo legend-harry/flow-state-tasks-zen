@@ -20,4 +20,6 @@ export interface FocusSession {
   mode: "focus" | "break";
   duration: number;
   timeLeft: number;
+  focusDuration?: number; // Added to store user's preferred focus duration
+  breakDuration?: number; // Added to store user's preferred break duration
 }

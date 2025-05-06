@@ -1,10 +1,11 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { Button } from "./ui/button";
-import { Clock, Play, Pause, RotateCcw } from "lucide-react";
+import { Clock, Play, Pause, RotateCcw, Timer } from "lucide-react";
 import { Progress } from "./ui/progress";
 import { toast } from "./ui/sonner";
 import { FocusSession, TodoItem } from "@/types/todo";
+import { Slider } from "./ui/slider";
 
 interface FocusModeProps {
   task: TodoItem;
@@ -13,6 +14,7 @@ interface FocusModeProps {
 }
 
 const FocusMode: React.FC<FocusModeProps> = ({ task, onClose, onComplete }) => {
+  // Default durations in minutes (converted to seconds for internal use)
   const DEFAULT_FOCUS_TIME = 25 * 60; // 25 minutes in seconds
   const DEFAULT_BREAK_TIME = 5 * 60; // 5 minutes in seconds
   
@@ -22,10 +24,32 @@ const FocusMode: React.FC<FocusModeProps> = ({ task, onClose, onComplete }) => {
     mode: "focus",
     duration: DEFAULT_FOCUS_TIME,
     timeLeft: DEFAULT_FOCUS_TIME,
+    focusDuration: 25, // Default focus duration in minutes
+    breakDuration: 5,  // Default break duration in minutes
   });
   
   const [isPaused, setIsPaused] = useState(true);
+  const [showSettings, setShowSettings] = useState(false);
   const intervalRef = useRef<number | null>(null);
+
+  // Apply timer settings when they change
+  const applyTimerSettings = () => {
+    const newDuration = session.mode === "focus" 
+      ? (session.focusDuration || 25) * 60 
+      : (session.breakDuration || 5) * 60;
+    
+    setSession(prev => ({
+      ...prev,
+      duration: newDuration,
+      timeLeft: newDuration
+    }));
+    
+    setIsPaused(true);
+    if (intervalRef.current) {
+      window.clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+  };
 
   useEffect(() => {
     // Clear interval when component unmounts
@@ -51,8 +75,8 @@ const FocusMode: React.FC<FocusModeProps> = ({ task, onClose, onComplete }) => {
           
           const nextMode = prev.mode === "focus" ? "break" : "focus";
           const nextDuration = nextMode === "focus" 
-            ? DEFAULT_FOCUS_TIME 
-            : DEFAULT_BREAK_TIME;
+            ? (prev.focusDuration || 25) * 60
+            : (prev.breakDuration || 5) * 60;
           
           // Play sound and show notification
           const audio = new Audio("https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3");
@@ -93,7 +117,7 @@ const FocusMode: React.FC<FocusModeProps> = ({ task, onClose, onComplete }) => {
     return () => {
       if (intervalRef.current) window.clearInterval(intervalRef.current);
     };
-  }, [isPaused, DEFAULT_FOCUS_TIME, DEFAULT_BREAK_TIME]);
+  }, [isPaused]);
 
   const formatTime = (seconds: number): string => {
     const mins = Math.floor(seconds / 60);
@@ -109,8 +133,40 @@ const FocusMode: React.FC<FocusModeProps> = ({ task, onClose, onComplete }) => {
     setIsPaused(true);
     setSession((prev) => ({
       ...prev,
-      timeLeft: prev.mode === "focus" ? DEFAULT_FOCUS_TIME : DEFAULT_BREAK_TIME,
+      timeLeft: prev.mode === "focus" 
+        ? (prev.focusDuration || 25) * 60 
+        : (prev.breakDuration || 5) * 60,
     }));
+  };
+
+  const updateFocusDuration = (value: number[]) => {
+    const newValue = value[0];
+    setSession(prev => ({
+      ...prev,
+      focusDuration: newValue
+    }));
+    if (session.mode === "focus" && isPaused) {
+      setSession(prev => ({
+        ...prev,
+        duration: newValue * 60,
+        timeLeft: newValue * 60
+      }));
+    }
+  };
+
+  const updateBreakDuration = (value: number[]) => {
+    const newValue = value[0];
+    setSession(prev => ({
+      ...prev,
+      breakDuration: newValue
+    }));
+    if (session.mode === "break" && isPaused) {
+      setSession(prev => ({
+        ...prev,
+        duration: newValue * 60,
+        timeLeft: newValue * 60
+      }));
+    }
   };
 
   const progress = Math.round((session.timeLeft / session.duration) * 100);
@@ -132,10 +188,64 @@ const FocusMode: React.FC<FocusModeProps> = ({ task, onClose, onComplete }) => {
           <h3 className="text-xl font-bold text-slate-800 dark:text-slate-200">
             {session.mode === "focus" ? "Focus Time" : "Break Time"}
           </h3>
-          <Button variant="ghost" size="sm" onClick={onClose} className="text-slate-500">
-            Exit Focus Mode
-          </Button>
+          <div className="flex space-x-2">
+            <Button 
+              variant="outline"
+              size="sm" 
+              onClick={() => setShowSettings(!showSettings)}
+              className="flex items-center gap-1"
+            >
+              <Timer className="h-4 w-4" />
+              {showSettings ? "Hide" : "Settings"}
+            </Button>
+            <Button variant="ghost" size="sm" onClick={onClose} className="text-slate-500">
+              Exit
+            </Button>
+          </div>
         </div>
+        
+        {showSettings && (
+          <div className="settings-panel mb-6 p-4 bg-slate-50 dark:bg-slate-800/50 rounded-lg border border-slate-200 dark:border-slate-700 animate-fade-in">
+            <h4 className="text-sm font-medium mb-3 text-slate-600 dark:text-slate-300">Timer Settings</h4>
+            
+            <div className="mb-4">
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-sm">Focus Duration: {session.focusDuration} mins</span>
+              </div>
+              <Slider
+                value={[session.focusDuration || 25]}
+                min={5}
+                max={60}
+                step={5}
+                onValueChange={updateFocusDuration}
+                className="mb-6"
+              />
+            </div>
+            
+            <div>
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-sm">Break Duration: {session.breakDuration} mins</span>
+              </div>
+              <Slider
+                value={[session.breakDuration || 5]}
+                min={1}
+                max={15}
+                step={1}
+                onValueChange={updateBreakDuration}
+                className="mb-2"
+              />
+            </div>
+            
+            <Button 
+              variant="default" 
+              size="sm" 
+              onClick={applyTimerSettings}
+              className="mt-2 w-full"
+            >
+              Apply Settings
+            </Button>
+          </div>
+        )}
         
         <div className="task-card p-4 rounded-lg bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-900/20 dark:to-indigo-900/20 border border-purple-100 dark:border-purple-900/30 mb-6">
           <h4 className="font-medium mb-1">Currently focusing on:</h4>
