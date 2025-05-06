@@ -1,10 +1,12 @@
 
-import React from "react";
+import React, { useState } from "react";
 import AddTodoForm from "@/components/AddTodoForm";
 import TodoList from "@/components/TodoList";
+import CalendarView from "@/components/CalendarView";
 import FocusMode from "@/components/FocusMode";
 import { TodoProvider, useTodoContext } from "@/context/TodoContext";
 import { Clock, Pencil, Book } from "lucide-react";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
 const FloatingIcons = () => (
   <div className="floating-icons fixed inset-0 pointer-events-none overflow-hidden z-0">
@@ -26,6 +28,8 @@ const TodoApp = () => {
     toggleTodo,
     endFocusSession
   } = useTodoContext();
+  
+  const [activeTab, setActiveTab] = useState<string>("list");
   
   const focusedTask = focusSession.active && focusSession.taskId 
     ? todos.find(todo => todo.id === focusSession.taskId) 
@@ -53,12 +57,25 @@ const TodoApp = () => {
           <>
             <AddTodoForm onAdd={addTodo} />
             
-            <TodoList 
-              filter={filter} 
-              sort={sort} 
-              onFilterChange={setFilter} 
-              onSortChange={setSort} 
-            />
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-8">
+              <TabsList className="grid grid-cols-2 w-[300px] mx-auto mb-6">
+                <TabsTrigger value="list">List View</TabsTrigger>
+                <TabsTrigger value="calendar">Calendar</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="list">
+                <TodoList 
+                  filter={filter} 
+                  sort={sort} 
+                  onFilterChange={setFilter} 
+                  onSortChange={setSort} 
+                />
+              </TabsContent>
+              
+              <TabsContent value="calendar">
+                <CalendarView todos={todos} />
+              </TabsContent>
+            </Tabs>
           </>
         )}
       </div>
