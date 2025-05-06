@@ -1,12 +1,13 @@
 
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { FilterType, Priority, SortType, TodoItem } from "../types/todo";
+import { FilterType, FocusSession, Priority, SortType, TodoItem } from "../types/todo";
 import { toast } from "../components/ui/sonner";
 
 interface TodoContextType {
   todos: TodoItem[];
   filter: FilterType;
   sort: SortType;
+  focusSession: FocusSession;
   addTodo: (text: string, priority: Priority, dueDate?: string) => void;
   toggleTodo: (id: string) => void;
   deleteTodo: (id: string) => void;
@@ -14,6 +15,8 @@ interface TodoContextType {
   clearCompleted: () => void;
   setFilter: (filter: FilterType) => void;
   setSort: (sort: SortType) => void;
+  startFocusSession: (taskId: string) => void;
+  endFocusSession: () => void;
 }
 
 const TodoContext = createContext<TodoContextType | undefined>(undefined);
@@ -22,6 +25,13 @@ export const TodoProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [todos, setTodos] = useState<TodoItem[]>([]);
   const [filter, setFilter] = useState<FilterType>("all");
   const [sort, setSort] = useState<SortType>("newest");
+  const [focusSession, setFocusSession] = useState<FocusSession>({
+    active: false,
+    taskId: null,
+    mode: "focus",
+    duration: 25 * 60,
+    timeLeft: 25 * 60
+  });
 
   useEffect(() => {
     // Load todos from localStorage on initial render
@@ -61,6 +71,11 @@ export const TodoProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const deleteTodo = (id: string) => {
+    // If the task is in focus mode, end the focus session
+    if (focusSession.active && focusSession.taskId === id) {
+      endFocusSession();
+    }
+    
     setTodos((prev) => prev.filter((todo) => todo.id !== id));
     toast.info("Task deleted");
   };
@@ -79,14 +94,44 @@ export const TodoProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const clearCompleted = () => {
+    // If a completed task is in focus mode, end the focus session
+    const completedTodos = todos.filter(todo => todo.completed);
+    const inFocusAndCompleted = completedTodos.some(todo => todo.id === focusSession.taskId);
+    
+    if (inFocusAndCompleted) {
+      endFocusSession();
+    }
+    
     setTodos((prev) => prev.filter((todo) => !todo.completed));
     toast.info("Completed tasks cleared");
+  };
+  
+  const startFocusSession = (taskId: string) => {
+    setFocusSession({
+      active: true,
+      taskId,
+      mode: "focus",
+      duration: 25 * 60, // 25 minutes in seconds
+      timeLeft: 25 * 60
+    });
+    toast.success("Focus session started!");
+  };
+  
+  const endFocusSession = () => {
+    setFocusSession({
+      active: false,
+      taskId: null,
+      mode: "focus",
+      duration: 25 * 60,
+      timeLeft: 25 * 60
+    });
   };
 
   const value = {
     todos,
     filter,
     sort,
+    focusSession,
     addTodo,
     toggleTodo,
     deleteTodo,
@@ -94,6 +139,8 @@ export const TodoProvider: React.FC<{ children: React.ReactNode }> = ({ children
     clearCompleted,
     setFilter,
     setSort,
+    startFocusSession,
+    endFocusSession,
   };
 
   return <TodoContext.Provider value={value}>{children}</TodoContext.Provider>;

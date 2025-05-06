@@ -22,7 +22,7 @@ const TodoList: React.FC<TodoListProps> = ({
   onFilterChange,
   onSortChange,
 }) => {
-  const { todos, toggleTodo, deleteTodo, editTodo, clearCompleted } = useTodoContext();
+  const { todos, toggleTodo, deleteTodo, editTodo, clearCompleted, focusSession } = useTodoContext();
 
   const filteredAndSortedTodos = useMemo(() => {
     // First filter the todos
@@ -119,6 +119,7 @@ const TodoList: React.FC<TodoListProps> = ({
               onToggle={toggleTodo}
               onDelete={deleteTodo}
               onEdit={editTodo}
+              isFocused={focusSession.active && focusSession.taskId === todo.id}
             />
           ))}
         </div>

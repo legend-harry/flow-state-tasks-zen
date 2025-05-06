@@ -1,7 +1,7 @@
 
 import React, { useState } from "react";
 import { TodoItem as TodoItemType, Priority } from "../types/todo";
-import { Check, Pencil, Trash2, Calendar, Star } from "lucide-react";
+import { Check, Pencil, Trash2, Calendar, Star, Clock } from "lucide-react";
 import { Button } from "./ui/button";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "./ui/dialog";
 import { Input } from "./ui/input";
@@ -11,21 +11,25 @@ import { format } from "date-fns";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { Calendar as CalendarComponent } from "./ui/calendar";
 import { cn } from "@/lib/utils";
+import { useTodoContext } from "@/context/TodoContext";
 
 interface TodoItemProps {
   todo: TodoItemType;
   onToggle: (id: string) => void;
   onDelete: (id: string) => void;
   onEdit: (id: string, text: string, priority: Priority, dueDate?: string) => void;
+  isFocused?: boolean;
 }
 
-const TodoItem: React.FC<TodoItemProps> = ({ todo, onToggle, onDelete, onEdit }) => {
+const TodoItem: React.FC<TodoItemProps> = ({ todo, onToggle, onDelete, onEdit, isFocused = false }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedText, setEditedText] = useState(todo.text);
   const [editedPriority, setEditedPriority] = useState<Priority>(todo.priority);
   const [editedDueDate, setEditedDueDate] = useState<Date | undefined>(
     todo.dueDate ? new Date(todo.dueDate) : undefined
   );
+
+  const { startFocusSession } = useTodoContext();
 
   const handleSave = () => {
     onEdit(
@@ -66,11 +70,15 @@ const TodoItem: React.FC<TodoItemProps> = ({ todo, onToggle, onDelete, onEdit })
     }
   };
 
+  const handleStartFocus = () => {
+    startFocusSession(todo.id);
+  };
+
   return (
     <div
       className={`task-item p-4 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-sm transition-all ${
         todo.completed ? "completed" : ""
-      } animate-fade-in`}
+      } ${isFocused ? "ring-2 ring-primary ring-offset-2 dark:ring-offset-slate-900" : ""} animate-fade-in`}
     >
       <div className="flex items-center gap-3">
         <div
@@ -106,6 +114,18 @@ const TodoItem: React.FC<TodoItemProps> = ({ todo, onToggle, onDelete, onEdit })
         </div>
 
         <div className="flex items-center gap-1 flex-shrink-0">
+          {!todo.completed && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400"
+              onClick={handleStartFocus}
+            >
+              <Clock className="h-4 w-4" />
+              <span className="sr-only">Focus</span>
+            </Button>
+          )}
+          
           <Button
             variant="ghost"
             size="icon"

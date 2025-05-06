@@ -13,3 +13,11 @@ export interface TodoItem {
 export type FilterType = "all" | "active" | "completed";
 
 export type SortType = "newest" | "oldest" | "priority" | "dueDate";
+
+export interface FocusSession {
+  active: boolean;
+  taskId: string | null;
+  mode: "focus" | "break";
+  duration: number;
+  timeLeft: number;
+}
