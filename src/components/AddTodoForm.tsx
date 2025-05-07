@@ -10,6 +10,7 @@ import { Calendar as CalendarComponent } from "./ui/calendar";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { Label } from "./ui/label";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface AddTodoFormProps {
   onAdd: (text: string, priority: Priority, dueDate?: string) => void;
@@ -19,6 +20,7 @@ const AddTodoForm: React.FC<AddTodoFormProps> = ({ onAdd }) => {
   const [text, setText] = useState("");
   const [priority, setPriority] = useState<Priority>("medium");
   const [date, setDate] = useState<Date>();
+  const isMobile = useIsMobile();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,7 +38,7 @@ const AddTodoForm: React.FC<AddTodoFormProps> = ({ onAdd }) => {
         Flow State Tasks
       </h1>
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="flex flex-col sm:flex-row gap-4">
+        <div className={`flex flex-col gap-4 ${isMobile ? 'space-y-2' : 'sm:flex-row'}`}>
           <Input
             placeholder="What needs to be done?"
             value={text}
@@ -44,12 +46,12 @@ const AddTodoForm: React.FC<AddTodoFormProps> = ({ onAdd }) => {
             className="flex-grow shadow-sm"
             data-cy="add-todo-input"
           />
-          <div className="flex gap-2">
+          <div className={`flex ${isMobile ? 'flex-wrap justify-between' : 'gap-2'}`}>
             <Select
               value={priority}
               onValueChange={(value) => setPriority(value as Priority)}
             >
-              <SelectTrigger className="w-32">
+              <SelectTrigger className={`${isMobile ? 'w-[48%] mb-2' : 'w-32'}`}>
                 <SelectValue placeholder="Priority" />
               </SelectTrigger>
               <SelectContent>
@@ -61,7 +63,10 @@ const AddTodoForm: React.FC<AddTodoFormProps> = ({ onAdd }) => {
 
             <Popover>
               <PopoverTrigger asChild>
-                <Button variant="outline" className="w-[130px]">
+                <Button 
+                  variant="outline" 
+                  className={`${isMobile ? 'w-[48%] mb-2' : 'w-[130px]'}`}
+                >
                   <Calendar className="mr-2 h-4 w-4" />
                   {date ? format(date, "PP") : "Due Date"}
                 </Button>
@@ -76,7 +81,10 @@ const AddTodoForm: React.FC<AddTodoFormProps> = ({ onAdd }) => {
               </PopoverContent>
             </Popover>
 
-            <Button type="submit" className="bg-todo-purple hover:bg-todo-deep-purple">
+            <Button 
+              type="submit" 
+              className={`bg-todo-purple hover:bg-todo-deep-purple ${isMobile ? 'w-full mt-1' : ''}`}
+            >
               <Plus className="h-4 w-4 mr-1" /> Add
             </Button>
           </div>
