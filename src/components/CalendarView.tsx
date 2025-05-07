@@ -42,8 +42,8 @@ const CalendarView: React.FC<CalendarViewProps> = ({ todos }) => {
   }, [todos, selectedDate]);
 
   // Custom day render function for the calendar component
-  const renderDay = (day: Date) => {
-    const dateKey = format(day, 'yyyy-MM-dd');
+  const renderDay = (date: Date) => {
+    const dateKey = format(date, 'yyyy-MM-dd');
     const tasksForDate = calendarEntries[dateKey] || [];
     
     // Get counts by priority
@@ -93,10 +93,10 @@ const CalendarView: React.FC<CalendarViewProps> = ({ todos }) => {
               onSelect={(date) => date && setSelectedDate(date)}
               className="pointer-events-auto"
               components={{
-                DayContent: ({ day }) => (
+                DayContent: (props) => (
                   <>
-                    <span>{format(day, 'd')}</span>
-                    {renderDay(day)}
+                    <span>{format(props.date, 'd')}</span>
+                    {renderDay(props.date)}
                   </>
                 )
               }}
