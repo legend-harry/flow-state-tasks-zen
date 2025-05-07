@@ -46,31 +46,31 @@ const CalendarView: React.FC<CalendarViewProps> = ({ todos }) => {
     const dateKey = format(date, 'yyyy-MM-dd');
     const tasksForDate = calendarEntries[dateKey] || [];
     
-    // Get counts by priority
-    const highPriorityCount = tasksForDate.filter(t => t.priority === "high").length;
-    const mediumPriorityCount = tasksForDate.filter(t => t.priority === "medium").length;
-    const lowPriorityCount = tasksForDate.filter(t => t.priority === "low").length;
+    if (tasksForDate.length === 0) return null;
     
-    // If there are tasks on this day, show indicators
-    if (tasksForDate.length > 0) {
-      return (
-        <div className="relative w-full h-full">
-          <div className="absolute w-full justify-center flex -bottom-1">
-            {highPriorityCount > 0 && (
-              <div className="h-1.5 w-1.5 rounded-full bg-todo-high-priority mx-0.5" />
-            )}
-            {mediumPriorityCount > 0 && (
-              <div className="h-1.5 w-1.5 rounded-full bg-todo-medium-priority mx-0.5" />
-            )}
-            {lowPriorityCount > 0 && (
-              <div className="h-1.5 w-1.5 rounded-full bg-todo-low-priority mx-0.5" />
-            )}
-          </div>
-        </div>
-      );
+    // Get highest priority for outline color
+    let highestPriority = "low";
+    
+    for (const task of tasksForDate) {
+      if (task.priority === "high") {
+        highestPriority = "high";
+        break;
+      } else if (task.priority === "medium" && highestPriority !== "high") {
+        highestPriority = "medium";
+      }
     }
     
-    return null;
+    const outlineColor = 
+      highestPriority === "high" ? "border-todo-high-priority" :
+      highestPriority === "medium" ? "border-todo-medium-priority" :
+      "border-todo-low-priority";
+    
+    return (
+      <div className={cn(
+        "absolute inset-0 border-2 rounded-full -m-0.5",
+        outlineColor
+      )}/>
+    );
   };
 
   const getPriorityColor = (priority: string) => {
@@ -94,10 +94,10 @@ const CalendarView: React.FC<CalendarViewProps> = ({ todos }) => {
               className="pointer-events-auto"
               components={{
                 DayContent: (props) => (
-                  <>
+                  <div className="relative w-full h-full flex items-center justify-center">
                     <span>{format(props.date, 'd')}</span>
                     {renderDay(props.date)}
-                  </>
+                  </div>
                 )
               }}
             />
