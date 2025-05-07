@@ -85,7 +85,7 @@
   }
 
   .task-item.completed .task-text {
-    @apply line-through text-muted-foreground;
+    @apply line-through text-completedTask;
   }
 
   .task-checkbox {
@@ -154,7 +154,54 @@
     @apply bg-gradient-to-br from-white to-purple-50 dark:from-slate-900 dark:to-slate-800;
   }
   
-  /* Floating elements animation */
+  /* Dynamic background gradient */
+  .dynamic-gradient-bg {
+    background: linear-gradient(-45deg, #A0D2DB, #C3AED6, #F7C5A6);
+    background-size: 400% 400%;
+    @apply animate-gradient-shift;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .dynamic-gradient-bg.dark {
+    background: linear-gradient(-45deg, #38495a, #4b3a72, #7d5865);
+    background-size: 400% 400%;
+  }
+  
+  /* Floating geometric shapes */
+  .bg-shape {
+    @apply fixed pointer-events-none opacity-10;
+    filter: blur(3px);
+  }
+  
+  .bg-shape-1 {
+    @apply w-64 h-64 bg-dynamic-teal rounded-full top-1/4 left-1/4 -ml-32 -mt-32 animate-shape-drift-1;
+  }
+  
+  .bg-shape-2 {
+    @apply w-96 h-96 bg-dynamic-lavender rounded-full bottom-1/4 right-1/4 -mr-48 -mb-48 animate-shape-drift-2;
+  }
+  
+  .bg-shape-3 {
+    @apply w-80 h-80 bg-dynamic-peach rounded-full top-3/4 left-3/4 -ml-40 -mt-40 animate-shape-drift-3;
+  }
+  
+  /* Enhanced button styles */
+  .enhanced-btn {
+    @apply rounded-lg transition-all duration-300 ease-in-out transform;
+  }
+  
+  .enhanced-btn:hover {
+    @apply scale-105 shadow-md;
+    filter: brightness(1.1);
+  }
+  
+  .enhanced-btn:active {
+    @apply scale-95;
+    filter: brightness(0.95);
+  }
+  
+  /* Floating icons animation */
   @keyframes float {
     0%, 100% { transform: translateY(0); }
     50% { transform: translateY(-15px); }

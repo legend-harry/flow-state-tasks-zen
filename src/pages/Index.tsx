@@ -16,6 +16,14 @@ const FloatingIcons = () => (
   </div>
 );
 
+const BackgroundShapes = () => (
+  <>
+    <div className="bg-shape bg-shape-1"></div>
+    <div className="bg-shape bg-shape-2"></div>
+    <div className="bg-shape bg-shape-3"></div>
+  </>
+);
+
 const TodoApp = () => {
   const { 
     addTodo, 
@@ -43,10 +51,11 @@ const TodoApp = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-gray-900 dark:to-slate-900 py-12 px-4 relative overflow-hidden">
+    <div className="min-h-screen dynamic-gradient-bg py-12 px-4 relative overflow-hidden">
+      <BackgroundShapes />
       <FloatingIcons />
       
-      <div className="todo-container relative z-10">
+      <div className="todo-container relative z-10 backdrop-blur-sm bg-white/90 dark:bg-slate-900/90">
         {focusSession.active && focusedTask ? (
           <FocusMode 
             task={focusedTask} 
@@ -58,9 +67,9 @@ const TodoApp = () => {
             <AddTodoForm onAdd={addTodo} />
             
             <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-8">
-              <TabsList className="grid grid-cols-2 w-[300px] mx-auto mb-6">
-                <TabsTrigger value="list">List View</TabsTrigger>
-                <TabsTrigger value="calendar">Calendar</TabsTrigger>
+              <TabsList className="grid grid-cols-2 w-[300px] mx-auto mb-6 enhanced-btn">
+                <TabsTrigger value="list" className="interactive-element">List View</TabsTrigger>
+                <TabsTrigger value="calendar" className="interactive-element">Calendar</TabsTrigger>
               </TabsList>
               
               <TabsContent value="list">
@@ -80,7 +89,7 @@ const TodoApp = () => {
         )}
       </div>
       
-      <footer className="mt-8 text-center text-sm text-slate-500 dark:text-slate-400 relative z-10">
+      <footer className="mt-8 text-center text-sm text-white dark:text-slate-400 relative z-10 backdrop-blur-sm bg-white/10 py-2 rounded-full mx-auto max-w-xs">
         <p>Flow State Tasks - Stay focused and productive</p>
       </footer>
     </div>

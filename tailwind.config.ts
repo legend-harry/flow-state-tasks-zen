@@ -67,9 +67,21 @@ export default {
 					purple: '#8B5CF6',
 					'deep-purple': '#7C3AED',
 					'light-purple': '#EDE9FE',
-					'high-priority': '#EF4444',
-					'medium-priority': '#F59E0B',
-					'low-priority': '#10B981',
+					'high-priority': '#DC3545',
+					'medium-priority': '#FFC107',
+					'low-priority': '#28A745',
+				},
+				uiElement: '#F8F9FA',
+				textPrimary: '#343A40',
+				accent: {
+					coral: '#FF7F50',
+					skyBlue: '#00BFFF',
+				},
+				completedTask: '#ADB5BD',
+				dynamic: {
+					teal: '#A0D2DB',
+					lavender: '#C3AED6',
+					peach: '#F7C5A6',
 				}
 			},
 			borderRadius: {
@@ -122,6 +134,38 @@ export default {
 				'float-alt': {
 					'0%, 100%': { transform: 'translateY(0) rotate(-6deg)' },
 					'50%': { transform: 'translateY(-20px) rotate(-6deg)' }
+				},
+				'gradient-shift': {
+					'0%': { backgroundPosition: '0% 50%' },
+					'50%': { backgroundPosition: '100% 50%' },
+					'100%': { backgroundPosition: '0% 50%' }
+				},
+				'button-hover': {
+					'0%': { transform: 'scale(1)' },
+					'100%': { transform: 'scale(1.05)' }
+				},
+				'button-click': {
+					'0%': { transform: 'scale(1)' },
+					'50%': { transform: 'scale(0.95)' },
+					'100%': { transform: 'scale(1)' }
+				},
+				'shape-drift-1': {
+					'0%': { transform: 'translate(0, 0) rotate(0deg)' },
+					'33%': { transform: 'translate(30px, -20px) rotate(10deg)' },
+					'66%': { transform: 'translate(-20px, 20px) rotate(5deg)' },
+					'100%': { transform: 'translate(0, 0) rotate(0deg)' }
+				},
+				'shape-drift-2': {
+					'0%': { transform: 'translate(0, 0) rotate(0deg)' },
+					'33%': { transform: 'translate(-40px, 10px) rotate(-15deg)' },
+					'66%': { transform: 'translate(20px, 30px) rotate(-5deg)' },
+					'100%': { transform: 'translate(0, 0) rotate(0deg)' }
+				},
+				'shape-drift-3': {
+					'0%': { transform: 'translate(0, 0) rotate(0deg)' },
+					'33%': { transform: 'translate(15px, 25px) rotate(5deg)' },
+					'66%': { transform: 'translate(-15px, -25px) rotate(10deg)' },
+					'100%': { transform: 'translate(0, 0) rotate(0deg)' }
 				}
 			},
 			animation: {
@@ -135,7 +179,13 @@ export default {
 				'check-mark': 'check-mark 0.3s ease-out',
 				'float': 'float 9s ease-in-out infinite',
 				'float-delay': 'float-delay 7s ease-in-out infinite',
-				'float-alt': 'float-alt 11s ease-in-out infinite'
+				'float-alt': 'float-alt 11s ease-in-out infinite',
+				'gradient-shift': 'gradient-shift 600s ease infinite',
+				'button-hover': 'button-hover 0.2s ease-out',
+				'button-click': 'button-click 0.2s ease-out',
+				'shape-drift-1': 'shape-drift-1 60s ease-in-out infinite',
+				'shape-drift-2': 'shape-drift-2 75s ease-in-out infinite',
+				'shape-drift-3': 'shape-drift-3 90s ease-in-out infinite'
 			}
 		}
 	},
